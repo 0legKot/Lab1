@@ -28,7 +28,11 @@ namespace Lab1
             {
                 CurrentDictionary.Add(name, element);
                 foreach (Selector dependency in Dependencies)
-                    if (!dependency.Items.Contains(name)) dependency.Items.Add(name);
+                    if (!dependency.Items.Contains(name))
+                    {
+                        dependency.Items.Add(name);
+                       // dependency.Items.Refresh();
+                    }
             }
             catch { throw new Exception($"Element {name} already exists"); }
         }
@@ -38,7 +42,10 @@ namespace Lab1
             {
                 CurrentDictionary.Remove(name);
                 foreach (Selector dependency in Dependencies)
+                {
                     if (dependency.Items.Contains(name)) dependency.Items.Remove(name);
+                    //dependency.Items.Refresh();
+                }
             }
             catch { throw new Exception($"Element {name} doesn't exist"); }
         }
@@ -186,11 +193,11 @@ namespace Lab1
                         {
                             case Class.TransportType:
                                 var tmpTransportType = new TransportType(currentName, chosenType, AverageTicketPrice.Text, Number.Text, MonthServiceCost.Text, AccidentRate.Text);
-                                TransportTypes.Add(currentName, tmpTransportType);
+                                TransportTypes.AddElement(tmpTransportType, currentName);
                                 break;
                             case Class.Transport:
                                 var tmpTransport = new Transport(currentName, TransportTypes[TypeOfTransport.Text], Capacity.Text, TicketPrice.Text);
-                                Transports.Add(currentName, tmpTransport);
+                                Transports.AddElement(tmpTransport, currentName);
                                 break;
                             case Class.Route:
                                 List<Stop> stopList = new List<Stop>();
@@ -199,11 +206,11 @@ namespace Lab1
                                 
 
                                 var tmpRoute = new Route(currentName, StartLocation.Text, EndLocation.Text, stopList, Transports[TransportBox.Text]);
-                                Routes.Add(currentName, tmpRoute);
+                                Routes.AddElement( tmpRoute, currentName);
                                 break;
                             case Class.Stop:
                                 var tmpStop = new Stop(currentName, Location.Text, OpenedFrom.Text, ClosedAt.Text);
-                                Stops.Add(currentName, tmpStop);
+                                Stops.AddElement(tmpStop, currentName);
                                 break;
                         }
                         break;
