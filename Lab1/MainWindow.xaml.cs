@@ -14,8 +14,8 @@ namespace Lab1
     // TODO: Create class with Dictionary, Visual list of items, List Of Selectors DONE
     class MyDictionary<V, T> : Dictionary<string, T> where V : IComparable, ICloneable, IConvertible, IComparable<String>, IEnumerable<char>, IEquatable<String>
     {
-        public Dictionary<string, T> CurrentDictionary { get; set; }
-        public List<Selector> Dependencies { get; set; }
+         Dictionary<string, T> CurrentDictionary { get; set; }
+         List<Selector> Dependencies { get; set; }
         //int key=0;
         public MyDictionary()
         {
@@ -52,6 +52,15 @@ namespace Lab1
         public void EditElement(T element, string name)
         {
             CurrentDictionary[name]=element;
+        }
+
+        public T GetElement(string name, string err="")
+        {
+            try
+            {
+                return CurrentDictionary[name];
+            }
+            catch { throw new Exception($"No {err} selected"); }
         }
         public void AddDependency(Selector selector)
         {
@@ -167,16 +176,16 @@ namespace Lab1
                                 TransportTypes.EditElement(tmpTransportType, currentName);
                                 break;
                             case Class.Transport:
-                                var tmpTransport = new Transport(currentName, TransportTypes[TypeOfTransport.Text], Capacity.Text, TicketPrice.Text);
+                                var tmpTransport = new Transport(currentName, TransportTypes.GetElement(TypeOfTransport.Text,"type of transport"), Capacity.Text, TicketPrice.Text);
                                 Transports.EditElement(tmpTransport, currentName);
                                 break;
                             case Class.Route:
                                 List<Stop> stopList = new List<Stop>();
                                 foreach (string s in ChosenStops.Items)
-                                    stopList.Add(Stops[s]);
+                                    stopList.Add(Stops.GetElement(s,"stop"));
                                 
 
-                                var tmpRoute = new Route(currentName, StartLocation.Text, EndLocation.Text, stopList, Transports[TransportBox.Text]);
+                                var tmpRoute = new Route(currentName, StartLocation.Text, EndLocation.Text, stopList, Transports.GetElement(TransportBox.Text,"transport"));
                                 Routes.EditElement(tmpRoute, currentName);
                                 break;
                             case Class.Stop:
@@ -196,16 +205,16 @@ namespace Lab1
                                 TransportTypes.AddElement(tmpTransportType, currentName);
                                 break;
                             case Class.Transport:
-                                var tmpTransport = new Transport(currentName, TransportTypes[TypeOfTransport.Text], Capacity.Text, TicketPrice.Text);
+                                var tmpTransport = new Transport(currentName, TransportTypes.GetElement(TypeOfTransport.Text,"type of transport"), Capacity.Text, TicketPrice.Text);
                                 Transports.AddElement(tmpTransport, currentName);
                                 break;
                             case Class.Route:
                                 List<Stop> stopList = new List<Stop>();
                                 foreach (string s in ChosenStops.Items)
-                                    stopList.Add(Stops[s]);
+                                    stopList.Add(Stops.GetElement(s,"stop"));
                                 
 
-                                var tmpRoute = new Route(currentName, StartLocation.Text, EndLocation.Text, stopList, Transports[TransportBox.Text]);
+                                var tmpRoute = new Route(currentName, StartLocation.Text, EndLocation.Text, stopList, Transports.GetElement(TransportBox.Text,"transport"));
                                 Routes.AddElement( tmpRoute, currentName);
                                 break;
                             case Class.Stop:
@@ -334,7 +343,7 @@ namespace Lab1
         {
             if (TypeOfTransportList.SelectedItem != null)
             {
-                var tmp = TransportTypes[TypeOfTransportList.SelectedItem.ToString()];
+                var tmp = TransportTypes.GetElement(TypeOfTransportList.SelectedItem.ToString());
                 NameOfTransportType.Text = tmp.Name;
                 Position.Text = tmp.Position.ToString();
                 AverageTicketPrice.Text = tmp.AvgTicketPrice.ToString();
@@ -349,7 +358,7 @@ namespace Lab1
         {
             if (TransportList.SelectedItem != null)
             {
-                var tmp = Transports[TransportList.SelectedItem.ToString()];
+                var tmp = Transports.GetElement(TransportList.SelectedItem.ToString());
                 Id.Text = tmp.Id;
                 Capacity.Text = tmp.Capacity.ToString();
                 TicketPrice.Text = tmp.TicketPrice.ToString();
@@ -360,7 +369,7 @@ namespace Lab1
         {
             if (RouteList.SelectedItem != null)
             {
-                var tmp = Routes[RouteList.SelectedItem.ToString()];
+                var tmp = Routes.GetElement(RouteList.SelectedItem.ToString());
                 NameOfRoute.Text = tmp.Name;
                 StartLocation.Text = tmp.StartLocation;
                 EndLocation.Text = tmp.EndLocation;
@@ -374,7 +383,7 @@ namespace Lab1
         {
             if (StopList.SelectedItem != null)
             {
-                var tmp = Stops[StopList.SelectedItem.ToString()];
+                var tmp = Stops.GetElement(StopList.SelectedItem.ToString());
                 NameOfStop.Text = tmp.Name;
                 Location.Text = tmp.Location;
                 OpenedFrom.Text = tmp.OpenedFrom.ToShortTimeString();
