@@ -54,10 +54,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MainWindow.Action.cs" />
+    <Compile Include="MainWindow.Class.cs" />
     <Compile Include="Route.cs" />
     <Compile Include="Stop.cs" />
     <Compile Include="Transport.cs" />
     <Compile Include="TransportType.cs" />
+    <Compile Include="Type.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

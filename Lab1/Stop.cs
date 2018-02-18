@@ -1,25 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lab1
 {
     class Stop
     {
-        public string Name;
-        public string Location;
-        public DateTime OpenedFrom;
-        public DateTime ClosedAt;
-        
+        public string Name { get; set; }
+        public string Location { get; set; }
+        public DateTime OpenedFrom { get; set; }
+        public DateTime ClosedAt { get; set; }
 
-        public Stop(string name, string location, DateTime openedFrom, DateTime closedAt)
+
+        public Stop(string name, string location, string openedFrom, string closedAt)
         {
             Name = name;
             Location = location;
-            OpenedFrom = openedFrom;
-            ClosedAt = closedAt;
+            if (!DateTime.TryParse(openedFrom, out DateTime tmpOpenedFrom))
+                throw new Exception("Incorrect input for opened from");
+            if (!DateTime.TryParse(closedAt, out DateTime tmpClosedAt))
+                throw new Exception("Incorrect input for closed at");
+            if (tmpOpenedFrom < tmpClosedAt)
+            {
+                OpenedFrom = tmpOpenedFrom;
+                ClosedAt = tmpClosedAt;
+            }
+            else throw new Exception("Closing must be after opening");
         }
     }
 }

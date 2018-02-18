@@ -1,214 +1,271 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace Lab1
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    /// 
+
+    // TODO: Create class with Dictionary, Visual list of items, List Of Selectors DONE
+    class MyDictionary<V, T> : Dictionary<string, T> where V : IComparable, ICloneable, IConvertible, IComparable<String>, IEnumerable<char>, IEquatable<String>
+    {
+        public Dictionary<string, T> CurrentDictionary { get; set; }
+        public List<Selector> Dependencies { get; set; }
+        //int key=0;
+        public MyDictionary()
+        {
+            CurrentDictionary = new Dictionary<string, T>();
+            Dependencies = new List<Selector>();
+        }
+        public void AddElement(T element,string name)
+        {
+            try
+            {
+                CurrentDictionary.Add(name, element);
+                foreach (Selector dependency in Dependencies)
+                    if (!dependency.Items.Contains(name)) dependency.Items.Add(name);
+            }
+            catch { throw new Exception($"Element {name} already exists"); }
+        }
+        public void RemoveElement(string name)
+        {
+            try
+            {
+                CurrentDictionary.Remove(name);
+                foreach (Selector dependency in Dependencies)
+                    if (dependency.Items.Contains(name)) dependency.Items.Remove(name);
+            }
+            catch { throw new Exception($"Element {name} doesn't exist"); }
+        }
+        public void EditElement(T element, string name)
+        {
+            CurrentDictionary[name]=element;
+        }
+        public void AddDependency(Selector selector)
+        {
+            Dependencies.Add(selector);
+        }
+        public void RemoveDependency() {
+            throw new NotImplementedException();
+        }
+
+    }
     public partial class MainWindow : Window
     {
-        Dictionary<string, TransportType> TransportTypes = new Dictionary<string, TransportType>();
-        Dictionary<string, Transport> Transports = new Dictionary<string, Transport>();
-        Dictionary<string, Route> Routes = new Dictionary<string, Route>();
-        Dictionary<string, Stop> Stops = new Dictionary<string, Stop>();
+        // TODO: Add int-property to each class and use as key for Dictionaries  (maybe useless)
+        // MyDictionary<string, TransportType> TrTp = new MyDictionary<string, TransportType>();
+        MyDictionary<string, TransportType> TransportTypes = new MyDictionary<string, TransportType>();
+        MyDictionary<string, Transport> Transports = new MyDictionary<string, Transport>();
+        MyDictionary<string, Route> Routes = new MyDictionary<string, Route>();
+        MyDictionary<string, Stop> Stops = new MyDictionary<string, Stop>();
         public MainWindow()
         {
             InitializeComponent();
+
+            TransportTypes.AddDependency(TypeOfTransport);
+            TransportTypes.AddDependency(TypeOfTransportList);
+
+            Transports.AddDependency(TransportBox);
+            Transports.AddDependency(TransportList);
+
+            Routes.AddDependency(RouteList);
+
+            Stops.AddDependency(ChosenStops);
+            Stops.AddDependency(AvailableStops);
+            Stops.AddDependency(StopList);
         }
-
-
         private void AddTransportTypeButton_Click(object sender, RoutedEventArgs e)
         {
-            AddOrRemoveOrEdit("Add","TransportType");
+            AddOrRemoveOrEdit(Action.Add, Class.TransportType);
         }
 
-        private Type ChooseType()
+        private Type ChooseType(string source)
         {
-            Type chosenType;
-            switch (Position.Text.ToLower())
+
+            switch (source.ToLower())
             {
                 case "air":
-                    chosenType = Type.Air;
-                    break;
-                case "land":
-                    chosenType = Type.Land;
-                    break;
-                case "underground":
-                    chosenType = Type.Underground;
-                    break;
-                case "water":
-                    chosenType = Type.Water;
-                    break;
-                default:
-                    chosenType = Type.Other;
-                    break;
-            }
+                    return Type.Air;
 
-            return chosenType;
+                case "land":
+                    return Type.Land;
+
+                case "underground":
+                    return Type.Underground;
+
+                case "water":
+                    return Type.Water;
+
+                default:
+                    return Type.Other;
+
+            }
         }
 
-        private void AddOrRemoveOrEdit(string op, string currentClass)
+        // TODO: Add Enum for action, currentClass DONE
+        private void AddOrRemoveOrEdit(Action action, Class currentClass)
         {
-            Type chosenType = ChooseType();
+            Type chosenType = ChooseType(Position.Text);
             try
             {
                 string currentName = "";
                 try
                 {
-                    currentName = (op == "Add") ?
+                    currentName = (action == Action.Add) ?
                          ChooseName(currentClass) :
                          ChooseNameFromList(currentClass);
                 }
-                catch { MessageBox.Show("No item selected"); return; }
-                List<Stop> stopList = new List<Stop>();
-                foreach (string s in ChosenStops.Items)
-                    stopList.Add(Stops[s]);
-                if ((stopList.Count == 0) && (currentClass == "Route")) { MessageBox.Show("Select stops"); return; }
-                switch (op)
+                catch { throw new Exception("No item selected");  }
+                
+                // TODO: Add method to choose instance of MyDictionary and get it !!!!!!!!!!!!!!!!!!!!!!!
+
+
+                //dynamic currentElement=null;
+                ////MyDictionary<string,dynamic> currentDictionary=null;
+                //switch (currentClass)
+                //{
+                //    case Class.TransportType:
+                //        currentElement = new TransportType(currentName, chosenType, AverageTicketPrice.Text, Number.Text, MonthServiceCost.Text, AccidentRate.Text);
+                //        //currentDictionary = TransportTypes;
+                //        break;
+                //    case Class.Transport:
+                //        currentElement = new Transport(currentName, TransportTypes[TypeOfTransport.Text], Capacity.Text, TicketPrice.Text);
+                //        //currentDictionary = Transports;
+                //        break;
+                //    case Class.Route:
+                //        currentElement= new Route(currentName, StartLocation.Text, EndLocation.Text, stopList, Transports[TransportBox.Text]);
+                //        //currentDictionary = Routes;
+                //        break;
+                //    case Class.Stop:
+                //        currentElement= new Stop(currentName, Location.Text, OpenedFrom.Text, ClosedAt.Text);
+                //        //currentDictionary = Stops;
+                //        break;
+                //}
+
+                switch (action)
                 {
-                    case "Remove": RemoveItem(currentClass, currentName); break;
-                    case "Edit":
+                    case Action.Remove: RemoveItem(currentClass, currentName); break;
+                    case Action.Edit:
+                        //currentDictionary.EditElement(currentElement,currentName));
                         switch (currentClass)
                         {
-                            case "TransportType":
-                                var tmpTransportType = new TransportType(currentName, chosenType, double.Parse(AverageTicketPrice.Text), int.Parse(Number.Text), int.Parse(MonthServiceCost.Text), int.Parse(AccidentRate.Text));
-                                EditTransportType(tmpTransportType);
+                            case Class.TransportType:
+                                // TODO: Create constructor with texts as parameters () DONE 
+                                var tmpTransportType = new TransportType(currentName, chosenType, AverageTicketPrice.Text, Number.Text, MonthServiceCost.Text, AccidentRate.Text);
+                                TransportTypes.EditElement(tmpTransportType, currentName);
                                 break;
-                            case "Transport":
-                                var tmpTransport = new Transport(currentName, TransportTypes[TypeOfTransport.Text], int.Parse(Capacity.Text), int.Parse(TicketPrice.Text));
-                                EditTransport(tmpTransport);
+                            case Class.Transport:
+                                var tmpTransport = new Transport(currentName, TransportTypes[TypeOfTransport.Text], Capacity.Text, TicketPrice.Text);
+                                Transports.EditElement(tmpTransport, currentName);
                                 break;
-                            case "Route":
+                            case Class.Route:
+                                List<Stop> stopList = new List<Stop>();
+                                foreach (string s in ChosenStops.Items)
+                                    stopList.Add(Stops[s]);
+                                
+
                                 var tmpRoute = new Route(currentName, StartLocation.Text, EndLocation.Text, stopList, Transports[TransportBox.Text]);
-                                EditRoute(tmpRoute);
+                                Routes.EditElement(tmpRoute, currentName);
                                 break;
-                            case "Stop":
-                                var tmpStop = new Stop(currentName, Location.Text, DateTime.Parse(OpenedFrom.Text), DateTime.Parse(OpenedFrom.Text));
-                                EditStop(tmpStop);
+                            case Class.Stop:
+
+                                var tmpStop = new Stop(currentName, Location.Text, OpenedFrom.Text, ClosedAt.Text);
+                                Stops.EditElement(tmpStop, currentName);
+
                                 break;
                         }
                         break;
-                    case "Add":
+                    case Action.Add:
+                        //currentDictionary.AddElement(currentElement,currentName);
                         switch (currentClass)
                         {
-                            case "TransportType":
-                                var tmpTransportType = new TransportType(currentName, chosenType, double.Parse(AverageTicketPrice.Text), int.Parse(Number.Text), int.Parse(MonthServiceCost.Text), int.Parse(AccidentRate.Text));
-                                if (!TransportTypes.ContainsKey(currentName)) AddTransportType(currentName, tmpTransportType);
-                                else MessageBox.Show("This Transport type already exists");
+                            case Class.TransportType:
+                                var tmpTransportType = new TransportType(currentName, chosenType, AverageTicketPrice.Text, Number.Text, MonthServiceCost.Text, AccidentRate.Text);
+                                TransportTypes.Add(currentName, tmpTransportType);
                                 break;
-                            case "Transport":
-                                var tmpTransport = new Transport(currentName, TransportTypes[TypeOfTransport.Text], int.Parse(Capacity.Text), int.Parse(TicketPrice.Text));
-                                if (!Transports.ContainsKey(currentName)) AddTransport(tmpTransport);
-                                else MessageBox.Show("This Transport already exists");
+                            case Class.Transport:
+                                var tmpTransport = new Transport(currentName, TransportTypes[TypeOfTransport.Text], Capacity.Text, TicketPrice.Text);
+                                Transports.Add(currentName, tmpTransport);
                                 break;
-                            case "Route":
+                            case Class.Route:
+                                List<Stop> stopList = new List<Stop>();
+                                foreach (string s in ChosenStops.Items)
+                                    stopList.Add(Stops[s]);
+                                
+
                                 var tmpRoute = new Route(currentName, StartLocation.Text, EndLocation.Text, stopList, Transports[TransportBox.Text]);
-                                if (!Routes.ContainsKey(currentName)) AddRoute(tmpRoute);
-                                else MessageBox.Show("This Route already exists");
+                                Routes.Add(currentName, tmpRoute);
                                 break;
-                            case "Stop":
-                                var tmpStop = new Stop(currentName, Location.Text, DateTime.Parse(OpenedFrom.Text), DateTime.Parse(OpenedFrom.Text));
-                                if (!Stops.ContainsKey(currentName)) AddStop(tmpStop);
-                                else MessageBox.Show("This Stop already exists");
+                            case Class.Stop:
+                                var tmpStop = new Stop(currentName, Location.Text, OpenedFrom.Text, ClosedAt.Text);
+                                Stops.Add(currentName, tmpStop);
                                 break;
                         }
                         break;
                 }
             }
-            catch { MessageBox.Show("Incorrect format"); }
+            catch(Exception e) { MessageBox.Show(e.Message); }
         }
 
-        private void RemoveItem(string currentClass, string currentName)
+        private void RemoveItem(Class currentClass, string currentName)
         {
             switch (currentClass)
             {
-                case "TransportType": RemoveTransportType(currentName); break;
-                case "Transport": RemoveTransport(currentName); break;
-                case "Route": RemoveRoute(currentName); break;
-                case "Stop": RemoveStop(currentName); break;
+                case Class.TransportType: TransportTypes.RemoveElement(currentName); break;
+                case Class.Transport: Transports.RemoveElement(currentName); break;
+                case Class.Route: Routes.RemoveElement(currentName); break;
+                case Class.Stop: Stops.RemoveElement(currentName); break;
             }
         }
 
-        private string ChooseNameFromList(string currentClass)
+        private string ChooseNameFromList(Class currentClass)
         {
             switch (currentClass)
             {
-                case "TransportType":
+                case Class.TransportType:
                     return TypeOfTransportList.SelectedItem.ToString();
 
-                case "Transport":
+                case Class.Transport:
                     return TransportList.SelectedItem.ToString();
-                case "Route":
+                case Class.Route:
                     return RouteList.SelectedItem.ToString();
-                case "Stop":
+                case Class.Stop:
                     return StopList.SelectedItem.ToString();
             }
 
             return "";
         }
 
-        private string ChooseName(string currentClass)
+        private string ChooseName(Class currentClass)
         {
             switch (currentClass)
             {
-                case "TransportType":
+                case Class.TransportType:
                     return NameOfTransportType.Text;
-                case "Transport":
+                case Class.Transport:
                     return Id.Text;
-                case "Route":
+                case Class.Route:
                     return NameOfRoute.Text;
-                case "Stop":
+                case Class.Stop:
                     return NameOfStop.Text;
             }
 
             return "";
         }
 
-        private void EditTransportType(TransportType tmp)
-        {
-            TransportTypes[tmp.Name] = tmp;
-        }
-
-        private void RemoveTransportType(string currentName)
-        {
-            TransportTypes.Remove(currentName);
-            TypeOfTransport.Items.Remove(currentName);
-            TypeOfTransportList.Items.Remove(currentName);
-        }
-
-        private void AddTransportType(string currentName, TransportType tmp)
-        {
-            TransportTypes.Add(currentName, tmp);
-            TypeOfTransport.Items.Add(currentName);
-            TypeOfTransportList.Items.Add(currentName);
-        }
-
-
-
         private void AddTransportButton_Click(object sender, RoutedEventArgs e)
         {
-            AddOrRemoveOrEdit("Add", "Transport");
-        }
-
-        private void AddTransport(Transport tmp)
-        {
-            Transports.Add(Id.Text, tmp);
-            TransportBox.Items.Add(Id.Text);
-            TransportList.Items.Add(Id.Text);
+            AddOrRemoveOrEdit(Action.Add, Class.Transport);
         }
 
         private void AddStopButton_Click(object sender, RoutedEventArgs e)
         {
-            AddOrRemoveOrEdit("Add", "Stop");
-        }
-
-        private void AddStop(Stop tmp)
-        {
-            Stops.Add(NameOfStop.Text, tmp);
-            StopList.Items.Add(NameOfStop.Text);
-            AvailableStops.Items.Add(NameOfStop.Text);
+            AddOrRemoveOrEdit(Action.Add, Class.Stop);
         }
 
         private void AddStopToRouteButton_Click(object sender, RoutedEventArgs e)
@@ -218,13 +275,7 @@ namespace Lab1
 
         private void AddRouteButton_Click(object sender, RoutedEventArgs e)
         {
-            AddOrRemoveOrEdit("Add", "Route");
-        }
-
-        private void AddRoute(Route tmp)
-        {
-            Routes.Add(NameOfRoute.Text, tmp);
-            RouteList.Items.Add(NameOfRoute.Text);
+            AddOrRemoveOrEdit(Action.Add, Class.Route);
         }
 
         private void RemoveStopFromRouteButton_Click(object sender, RoutedEventArgs e)
@@ -232,93 +283,44 @@ namespace Lab1
             ChosenStops.Items.Remove(ChosenStops.SelectedItem);
         }
 
-
-
-
         private void EditTypeOfTransport_Click(object sender, RoutedEventArgs e)
         {
-            AddOrRemoveOrEdit("Edit", "TransportType");
+            AddOrRemoveOrEdit(Action.Edit, Class.TransportType);
         }
-
-
 
         private void RemoveTypeOfTransportButton_Click(object sender, RoutedEventArgs e)
         {
-            AddOrRemoveOrEdit("Remove", "TransportType");
-        }
-
-        private void RemoveTransportType()
-        {
-            TransportTypes.Remove(TypeOfTransportList.SelectedItem.ToString());
-            TypeOfTransport.Items.Remove(TypeOfTransportList.SelectedItem.ToString());
-            TypeOfTransportList.Items.Remove(TypeOfTransportList.SelectedItem);
+            AddOrRemoveOrEdit(Action.Remove, Class.TransportType);
         }
 
         private void RemoveTransportButton_Click(object sender, RoutedEventArgs e)
         {
-            AddOrRemoveOrEdit("Remove", "Transport");
-        }
-
-        private void RemoveTransport(string name)
-        {
-            Transports.Remove(name);
-            TransportBox.Items.Remove(name);
-            TransportList.Items.Remove(name);
+            AddOrRemoveOrEdit(Action.Remove, Class.Transport);
         }
 
         private void EditTransportButton_Click(object sender, RoutedEventArgs e)
         {
-            AddOrRemoveOrEdit("Edit", "Transport");
-        }
-
-        private void EditTransport(Transport tmp)
-        {
-            Transports[TransportList.SelectedItem.ToString()] = tmp;
+            AddOrRemoveOrEdit(Action.Edit, Class.Transport);
         }
 
         private void RemoveRouteButton_Click(object sender, RoutedEventArgs e)
         {
-            AddOrRemoveOrEdit("Remove", "Route");
-        }
-
-        private void RemoveRoute(string name)
-        {
-            Routes.Remove(name);
-            RouteList.Items.Remove(name);
+            AddOrRemoveOrEdit(Action.Remove, Class.Route);
         }
 
         private void EditRouteButton_Click(object sender, RoutedEventArgs e)
         {
-            AddOrRemoveOrEdit("Edit", "Route");
-        }
-
-        private void EditRoute(Route tmp)
-        {
-            Routes[RouteList.SelectedItem.ToString()] = tmp;
+            AddOrRemoveOrEdit(Action.Edit, Class.Route);
         }
 
         private void RemoveStopButton_Click(object sender, RoutedEventArgs e)
         {
-            AddOrRemoveOrEdit("Remove", "Stop");
-        }
-
-        private void RemoveStop(string name)
-        {
-            Stops.Remove(name);
-            if (ChosenStops.Items.Contains(name)) ChosenStops.Items.Remove(name);
-            if (AvailableStops.Items.Contains(name)) AvailableStops.Items.Remove(name);
-            AvailableStops.Items.Remove(name);
-            StopList.Items.Remove(name);
+            AddOrRemoveOrEdit(Action.Remove, Class.Stop);
         }
 
         private void EditStopButton_Click(object sender, RoutedEventArgs e)
         {
-            AddOrRemoveOrEdit("Edit", "Stop");
-        }
-
-        private void EditStop(Stop tmp)
-        {
-            Stops[StopList.SelectedItem.ToString()] = tmp;
+            AddOrRemoveOrEdit(Action.Edit, Class.Stop);
         }
 
         private void TypeOfTransportList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)

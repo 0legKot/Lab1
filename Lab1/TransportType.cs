@@ -1,36 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lab1
 {
-    enum Type : byte
-    {
-        Air,
-        Water,
-        Land,
-        Underground,
-        Other
-    }
     class TransportType
     {
-        public string Name;
-        public Type Position;
-        public double AvgTicketPrice;
-        public int Quantity;
-        public int MonthServiceCost;
-        public int AccidentRate;
+        public string Name { get; set; }
+        public Type Position { get; set; }
+        public decimal AvgTicketPrice { get; set; }
+        public int Quantity { get; set; }
+        public int MonthServiceCost { get; set; }
+        public int AccidentRate { get; set; }
 
-        public TransportType(string name, Type position, double avgTicketPrice, int quantity, int monthServiceCost, int accidentRate)
+        public TransportType(string name, Type position, string avgTicketPrice, string quantity, string monthServiceCost, string accidentRate)
         {
             Name = name;
             Position = position;
-            AvgTicketPrice = avgTicketPrice;
-            Quantity = quantity;
-            MonthServiceCost = monthServiceCost;
-            AccidentRate = accidentRate;
+            if (decimal.TryParse(avgTicketPrice, out decimal tmpAvgPrice)) AvgTicketPrice = tmpAvgPrice;
+            else throw new Exception("Incorrect input for average ticket price");
+            if (int.TryParse(quantity, out int tmpQuantity)) Quantity = tmpQuantity;
+            else throw new Exception("Incorrect input for quantity");
+            if (int.TryParse(monthServiceCost, out int tmpCost)) MonthServiceCost = tmpCost;
+            else throw new Exception("Incorrect input for month service cost");
+            if (int.TryParse(accidentRate, out int tmpAccidentRate)) AccidentRate = tmpAccidentRate;
+            else throw new Exception("Incorrect input for accident rate");
         }
     }
 }
