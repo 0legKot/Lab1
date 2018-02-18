@@ -2,9 +2,9 @@
 
 namespace Lab1
 {
-    class Stop
+    class Stop:AnyTransportClass
     {
-        public string Name { get; set; }
+        //public string Name { get; set; }
         public string Location { get; set; }
         public DateTime OpenedFrom { get; set; }
         public DateTime ClosedAt { get; set; }

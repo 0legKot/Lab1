@@ -54,6 +54,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AnyTransportClass.cs" />
     <Compile Include="MainWindow.Action.cs" />
     <Compile Include="MainWindow.Class.cs" />
     <Compile Include="MyDictionary.cs" />

@@ -2,9 +2,9 @@
 
 namespace Lab1
 {
-    class TransportType
+    class TransportType:AnyTransportClass
     {
-        public string Name { get; set; }
+        //public string Name { get; set; }
         public Type Position { get; set; }
         public decimal AvgTicketPrice { get; set; }
         public int Quantity { get; set; }

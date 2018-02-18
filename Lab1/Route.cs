@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace Lab1
 {
 
-    class Route
+    class Route: AnyTransportClass
     {
-        public string Name { get; set; }
+        //public string Name { get; set; }
         public string StartLocation { get; set; }
         public string EndLocation { get; set; }
         public List<Stop> Stops { get; set; }

@@ -4,18 +4,17 @@ using System.Windows.Controls.Primitives;
 
 namespace Lab1
 {
-    // TODO: Create class with Dictionary, Visual list of items, List Of Selectors DONE
-    class MyDictionary<V, T> : Dictionary<string, T> where V : IComparable, ICloneable, IConvertible, IComparable<String>, IEnumerable<char>, IEquatable<String>
+    class MyDictionary
     {
-         Dictionary<string, T> CurrentDictionary { get; set; }
+         Dictionary<string, AnyTransportClass> CurrentDictionary { get; set; }
          List<Selector> Dependencies { get; set; }
         //int key=0;
         public MyDictionary()
         {
-            CurrentDictionary = new Dictionary<string, T>();
+            CurrentDictionary = new Dictionary<string, AnyTransportClass>();
             Dependencies = new List<Selector>();
         }
-        public void AddElement(T element,string name)
+        public void AddElement(AnyTransportClass element,string name)
         {
             try
             {
@@ -42,12 +41,12 @@ namespace Lab1
             }
             catch { throw new Exception($"Element {name} doesn't exist"); }
         }
-        public void EditElement(T element, string name)
+        public void EditElement(AnyTransportClass element, string name)
         {
             CurrentDictionary[name]=element;
         }
 
-        public T GetElement(string name, string err="")
+        public AnyTransportClass GetElement(string name, string err="")
         {
             try
             {

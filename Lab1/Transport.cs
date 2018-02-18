@@ -2,16 +2,16 @@
 
 namespace Lab1
 {
-    class Transport
+    class Transport: AnyTransportClass
     {
-        public string Id { get; set; }
+        //public string Name { get; set; }
         public TransportType Type { get; set; }
         public int Capacity { get; set; }
         public decimal TicketPrice { get; set; }
 
         public Transport(string id, TransportType type, string capacity, string ticketPrice)
         {
-            Id = id;
+            Name = id;
             Type = type ?? throw new Exception("No transport type selected");
             if (int.TryParse(capacity, out int tmpCapacity)) Capacity = tmpCapacity;
             else throw new Exception("Incorrect input for capacity");
